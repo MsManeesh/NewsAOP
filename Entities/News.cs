@@ -12,5 +12,7 @@ namespace Entities
         public string CreatedBy { get; set; }
         public string Url { get; set; }
         public string UrlToImage { get; set; }
+        public UserProfile User { get; set; }
+        public Reminder Reminder { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 namespace Entities
 {
     public class UserProfile
@@ -9,5 +11,6 @@ namespace Entities
         public string Contact { get; set; }
         public string Email { get; set; }
         public DateTime CreatedAt { get; set; }
+        public List<News> NewsList { get; set; }
     }
 }

@@ -9,5 +9,6 @@ namespace Entities
         public int ReminderId { get; set; }
         public DateTime Schedule { get; set; }
         public int NewsId { get; set; }
+        public News News { get; set; }
     }
 }

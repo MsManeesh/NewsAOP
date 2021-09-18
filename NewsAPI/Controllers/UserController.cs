@@ -1,7 +1,9 @@
 ﻿using Entities;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using NewsAPI.Aspect;
 using Service;
+using System;
 using System.Threading.Tasks;
 
 namespace NewsAPI.Controllers
@@ -11,16 +13,19 @@ namespace NewsAPI.Controllers
     * the class with [ApiController] annotation and define the controller level route as per REST Api standard.
     * and also use ServiceFilter to handle the exception logic using ExceptionHandler
     */
+    [Route("api/[controller]")]
+    [ApiController]
+    [ServiceFilter(typeof(ExceptionHandler))]
     public class UserController : ControllerBase
     {
         /*
         * UserService should  be injected through constructor injection. 
         * Please note that we should not create userservice object using the new keyword
         */
-        
+        IUserService _userService;
         public UserController(IUserService userService)
         {
-            
+            _userService = userService;
         }
         /* Implement HttpVerbs and Functionalities asynchronously*/
 
@@ -32,7 +37,13 @@ namespace NewsAPI.Controllers
          * 1. 200(OK) - If the news found successfully.
          * This handler method should map to the URL "/api/user/{userId}" using HTTP GET method
          */
-
+        [HttpGet]
+        [Route("{userId}")]
+        public async Task<IActionResult> Get(string userId)
+        {
+            return Ok(await _userService.GetUser(userId));
+             
+        }
         /*
         * Define a handler method which will create a specific UserProfile by reading the
         * Serialized object from request body and save the user details in a User table
@@ -46,7 +57,12 @@ namespace NewsAPI.Controllers
         * 
         * This handler method should map to the URL "/api/user" using HTTP POST method
         */
-
+        [HttpPost]
+        public async Task<IActionResult> Post(UserProfile user)
+        {
+             bool flag = await _userService.AddUser(user);
+             return Created("", flag);
+        }
         /*
         * Define a handler method which will update a specific user by reading the
         * Serialized object from request body and save the updated user details in a
@@ -57,7 +73,13 @@ namespace NewsAPI.Controllers
         * 
         * This handler method should map to the URL "/api/user/{id}" using HTTP PUT method.
         */
-
+        [HttpPut]
+        [Route("{userId}")]
+        public async Task<IActionResult> Put(string userId, UserProfile user)
+        {
+            bool flag = await _userService.UpdateUser(userId, user);
+            return Ok(flag);
+        }
         /*
          * Define a handler method which will delete a specified UserProfile details from a database.
          * This handler method should return any one of the status messages basis on
@@ -67,6 +89,12 @@ namespace NewsAPI.Controllers
          * This handler method should map to the URL "/api/user/{id}" using HTTP Delete
          * method" where "id" should be replaced by a valid userId without {}
          */
-        
-    }
+        [HttpDelete]
+        [Route("{userId}")]
+        public async Task<IActionResult> Delete(string userId)
+        {
+            bool flag = await _userService.DeleteUser(userId);
+            return Ok(flag);
+        }
+     }
 }

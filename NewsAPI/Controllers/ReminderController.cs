@@ -10,16 +10,19 @@ namespace NewsAPI.Controllers
     * the class with [ApiController] annotation and define the controller level route as per REST Api standard.
     * and also use ServiceFilter to handle the exception logic using ExceptionHandler
     */
+    [Route("api/[controller]")]
+    [ApiController]
+    [ServiceFilter(typeof(ExceptionHandler))]
     public class ReminderController : ControllerBase
     {
         /*
         * ReminderService should  be injected through constructor injection. 
         * Please note that we should not create Reminderservice object using the new keyword
         */
-       
+        IReminderService _reminderService;
         public ReminderController(IReminderService reminderService)
         {
-            
+            _reminderService = reminderService;
         }
         /* Implement HttpVerbs and its Functionalities asynchronously*/
 
@@ -32,7 +35,14 @@ namespace NewsAPI.Controllers
         * 
         * This handler method should map to the URL "/api/reminder/{newsId}" using HTTP GET method
         */
-
+        [HttpGet]
+        [Route("{id:int}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            Reminder reminder = await _reminderService.GetReminderByNewsId(id);
+            return Ok(reminder);
+            
+        }
         /*
 	     * Define a handler method which will create a reminder by reading the
 	     * Serialized reminder object from request body and save the reminder in
@@ -46,7 +56,13 @@ namespace NewsAPI.Controllers
 	     * This handler method should map to the URL "/api/reminder" using HTTP POST
 	     * method".
 	     */
-
+        [HttpPost]
+        public async Task<IActionResult> Post(Reminder reminder)
+        {
+            Reminder output = await _reminderService.AddReminder(reminder);
+            return Created("", output);
+            
+        }
 
         /*
          * Define a handler method which will delete a reminder from a database.
@@ -57,6 +73,13 @@ namespace NewsAPI.Controllers
          * This handler method should map to the URL "/api/reminder/{id}" using HTTP Delete
          * method" where "id" should be replaced by a valid reminderId without {}
          */
-        
+        [HttpDelete]
+        [Route("{reminderId:int}")]
+        public async Task<IActionResult> Delete(int reminderId)
+        {
+            bool flag = await _reminderService.RemoveReminder(reminderId);
+            return Ok(flag);
+        }
+
     }
 }
